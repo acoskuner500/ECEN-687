@@ -1,8 +1,8 @@
 clear; clc;
 C0 = 400e-15;
 C1 = 1.4e-12;
-C2 = 20e-15;
-C3 = 20e-15;
+C2 = 820e-15;
+C3 = 220e-15;
 R0 = 100;
 R1 = 40;
 R2 = 80;
@@ -24,18 +24,21 @@ m01 =   0 - R0 * (m00 * C0 + m10 * C1 + m20 * C2 + m30 * C3);
 m11 = m01 - R1 * (m10 * C1 + m20 * C2 + m30 * C3);
 m21 = m11 - R2 * (m20 * C2);
 m31 = m11 - R3 * (m30 * C3);
+% m1 = [m01; m11; m21; m31]
 
 % Calculate m2
 m02 = vpa(  0 - R0 * (m01 * C0 + m11 * C1 + m21 * C2 + m31 * C3));
 m12 = vpa(m02 - R1 * (m11 * C1 + m21 * C2 + m31 * C3));
 m22 = vpa(m12 - R2 * (m21 * C2));
 m32 = vpa(m12 - R3 * (m31 * C3));
+% m2 = [m02; m12; m22; m32]
 
 % Calculate m3
-m03 = vpa(  0 - R0 * (m01 * C0 + m12 * C1 + m22 * C2 + m32 * C3));
+m03 = vpa(  0 - R0 * (m02 * C0 + m12 * C1 + m22 * C2 + m32 * C3));
 m13 = vpa(m03 - R1 * (m12 * C1 + m22 * C2 + m32 * C3));
 m23 = vpa(m13 - R2 * (m22 * C2));
 m33 = vpa(m13 - R3 * (m32 * C3));
+% m3 = [m03; m13; m23; m33]
 
 A0 = [m00 m01; m01 m02];
 A1 = [m10 m11; m11 m12];
@@ -79,14 +82,14 @@ V1 = ilaplace(V1);
 V2 = ilaplace(V2);
 V3 = ilaplace(V3);
 
-AWE0 = solve(V0 == 0.5, t);
-AWE1 = solve(V1 == 0.5, t);
-AWE2 = solve(V2 == 0.5, t);
-AWE3 = solve(V3 == 0.5, t);
+AWE0 = vpasolve([V0 == 0.5 t>0], t, )
+AWE1 = vpasolve([V1 == 0.5 t>0], t)
+AWE2 = vpasolve([V2 == 0.5 t>0], t)
+AWE3 = vpasolve([V3 == 0.5 t>0], t)
 AWE = [AWE0; AWE1; AWE2; AWE3]
 
-delayU = 1.72206e-10;
-delayV = 1.71019e-10;
+delayU = 3.29116e-10;
+delayV = 2.68340e-10;
 PEU_Elm = 100*abs(D2 - delayU)/delayU;
 PEV_Elm = 100*abs(D3 - delayV)/delayV;
 PEU_AWE = 100*abs(AWE2 - delayU)/delayU;
